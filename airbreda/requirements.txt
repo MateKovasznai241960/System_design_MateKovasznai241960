@@ -1,0 +1,13 @@
+requests==2.34.2
+tzdata==2026.4
+pandas==3.0.6
+psycopg2-binary==2.9.13
+# Task 008: the dashboard image installs this same file (Dockerfile.dashboard as
+# given), so its packages are here too and the air image carries them as well.
+# numpy is left unpinned on purpose: numpy 2.5 has no Python 3.11 wheel, so pip
+# picks 2.4.x in the dashboard image (python:3.11) and 2.5.x on Python 3.12.
+fastapi==0.142.2
+uvicorn==0.54.0
+boto3==1.43.105
+scikit-learn==1.9.0
+joblib==1.6.0

@@ -1,0 +1,39 @@
+# Containerised NDW traffic ingest for the four A27 sites near Breda -> CSV -> S3,
+# plus the valid readings -> PostgreSQL (task 005, D-043).
+# Build from the PROJECT ROOT (task 004, D-035):
+#   docker build -f Dockerfile.traffic -t airbreda-traffic .
+# Run: docker compose up (reads AIRBREDA_BUCKET, AWS_REGION and the AWS
+# credentials from .env). No S3 upload (the PG* variables are still needed):
+#   docker run --rm -e PGHOST -e PGPORT -e PGDATABASE -e PGUSER -e PGPASSWORD -e PGSSLMODE airbreda-traffic python ingest_traffic.py --no-upload
+# AWS credentials are runtime environment variables ONLY. Never add ENV or ARG
+# lines with AWS keys here: they would be stored in the image layers.
+FROM python:3.12-slim
+
+# Unbuffered output so progress shows up in container logs immediately.
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /app
+
+# Install dependencies first so this layer is cached when only code changes.
+# Only boto3 and psycopg2-binary: ingest_traffic.py and getTrafficReadings.py
+# need nothing else outside the standard library (D-021, task 005).
+COPY requirements-traffic.txt .
+RUN pip install -r requirements-traffic.txt
+
+# Copy only the code the script needs - no data files, no credentials.
+COPY getTrafficReadings.py ingest_traffic.py ./
+
+# Run as an unprivileged user. The script writes its CSVs to ./data (its
+# default --data-dir) before uploading, so that one directory belongs to
+# appuser; the code itself stays read-only for it.
+RUN useradd --create-home --uid 10001 appuser \
+    && mkdir /app/data \
+    && chown appuser /app/data
+USER appuser
+
+# Task 005 (D-041): long-running by default, GET /health on port 8002.
+EXPOSE 8002
+CMD ["python", "ingest_traffic.py", "--serve"]

@@ -1,0 +1,26 @@
+# Build context is this airbreda/ folder (docker-compose.yml; D-034, D-049, D-051).
+# Exclude-only list (D-052): everything in this folder is sent to Docker EXCEPT
+# the entries below. The Dockerfiles still COPY only their own named files, so
+# nothing else ends up in an image. If you add a new file here that must not
+# reach Docker (a secret, a large data file), add it to this list.
+
+# Secrets: never send these to the Docker daemon.
+.env
+.env.*
+**/.env
+**/.env.*
+*accessKeys*.csv
+**/*accessKeys*.csv
+*credentials*.csv
+**/*credentials*.csv
+
+# Tests and test config: not needed in the images.
+test_*.py
+pytest.ini
+requirements-dev.txt
+
+# Local artefacts: caches, virtual environments, local pipeline output.
+__pycache__/
+.pytest_cache/
+.venv/
+data/

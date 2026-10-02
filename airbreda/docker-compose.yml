@@ -1,0 +1,32 @@
+services:
+  air-ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: air-ingest
+    ports: ["127.0.0.1:8001:8001"]   # GET /health, laptop only (task 005)
+    env_file: .env   # PG* database settings read by ingest_air.py
+    networks: [airbreda]
+
+  traffic-ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile.traffic
+    container_name: traffic-ingest
+    ports: ["127.0.0.1:8002:8002"]   # GET /health, laptop only (task 005)
+    env_file: .env   # same file: AIRBREDA_BUCKET, AWS_REGION, AWS credentials, PG* for ingest_traffic.py
+    networks: [airbreda]
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    env_file: .env   # PG* for sensor_readings; AIRBREDA_BUCKET, AWS_REGION, AWS credentials for the bucket
+    ports:
+      - "8000:8000"
+    # Not in the task's block, but needed: the other services are only on this
+    # network, and GET /health calls air-ingest:8001 and traffic-ingest:8002 here.
+    networks: [airbreda]
+
+networks:
+  airbreda:

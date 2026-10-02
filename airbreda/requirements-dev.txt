@@ -1,0 +1,8 @@
+# Test-only dependencies (pytest). Install on the VM or laptop with
+#   pip install -r requirements-dev.txt
+# The .dockerignore allow-list keeps this file and the test_*.py files out of both images.
+-r requirements.txt
+-r requirements-traffic.txt
+pytest==9.1.1
+# Task 008: FastAPI's TestClient (test_dashboard.py) needs httpx2 (Starlette 1.7 deprecates plain httpx for it).
+httpx2==2.13.1

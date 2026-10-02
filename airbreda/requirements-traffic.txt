@@ -1,0 +1,6 @@
+# Dependencies for ingest_traffic.py only: boto3 (S3 upload) and, since task
+# 005, psycopg2 (sensor_readings, same pin as requirements.txt). Kept out of
+# requirements.txt so the air image does not carry ~32 MB of boto3/botocore it
+# never uses (D-021). Install both for local work: see requirements-dev.txt.
+boto3==1.43.105
+psycopg2-binary==2.9.13
