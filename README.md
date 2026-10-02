@@ -1,3 +1,8 @@
+---
+title: AirBreda Architecture Design Document
+permalink: /
+---
+
 # AirBreda: System design and cloud platforms elective
 
 AirBreda project collects air quality and traffic data for one motorway interchange in Breda, stores it on AWS, and shows it on a small dashboard with a predicted NO2 value and the risk that NO2 is too high.
